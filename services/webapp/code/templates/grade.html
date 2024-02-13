@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='styles.css') }}">
+    <title>Python Exam Autograding</title>
+  </head>
+  <body>
+    <h1 style="margin-top:60px">Python courses Autograding - results</h1>
+    {% if data.shell_out.exit_code != 0 %}
+      <p id="main">
+      <b>Results</b> [<a href="/" style="color:#ffffff">back</a>]
+      <b>Warning:</b> you got one or more errors, if you don't see any grade this is because they invalidated the entire evaluation process.
+      </p>
+    {% else %}
+      <p id="main">
+      <b>Results</b> [<a href="/" style="color:#ffffff">back</a>]
+      </p>
+    {% endif %}
+    <pre style='color:#ffffff; margin:30px'>
+    {{ data.shell_out.stderr}}
+    </pre> 
+    <pre style='color:#ffffff; margin:30px'>
+    {{ data.shell_out.stdout}}
+    </pre> 
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <div id="footer">
+      <p align="right" style="margin-right:30px">:)</p>
+    </div>
+  </body>
+</html>
