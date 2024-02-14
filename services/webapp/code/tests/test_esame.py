@@ -13,7 +13,7 @@ class TestComputeIncrements(unittest.TestCase):
         self.assertEqual(data[-1], ['1951-11', 100])
         
         global score
-        score += 1
+        score += 2
     
     def test_get_data_missing_file(self):
         file = CSVTimeSeriesFile('/data/missing.csv')
@@ -121,7 +121,7 @@ class TestComputeIncrements(unittest.TestCase):
         self.assertEqual(expected, actual)
         
         global score
-        score += 1
+        score += 3
         
     def test_first_last_four_digits(self):
         time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
@@ -235,6 +235,26 @@ class TestComputeIncrements(unittest.TestCase):
         expected = {'2020-2030': 20.0, '2030-2050': 10.0, '2050-2051': 10.0}
         actual = compute_increments(time_series, first_year, last_year)
         self.assertEqual(expected, actual)
+        
+        global score
+        score += 1
+        
+    def test_same_year(self):
+        time_series = [['2020-01', 100], ['2020-02', 120], ['2020-01', 130], ['2020-02', 140]]
+        first_year = '2020'
+        last_year = '2020'
+        with self.assertRaises(ExamException):
+            compute_increments(time_series, first_year, last_year)
+        
+        global score
+        score += 1
+        
+    def test_negative_years(self):
+        time_series = [['-999-01', 100], ['-999-02', 120], ['2020-01', 130], ['2020-02', 140]]
+        first_year = '-999'
+        last_year = '2020'
+        with self.assertRaises(ExamException):
+            compute_increments(time_series, first_year, last_year)
         
         global score
         score += 1
