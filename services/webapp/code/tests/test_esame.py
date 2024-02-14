@@ -9,29 +9,15 @@ class TestComputeIncrements(unittest.TestCase):
         file = CSVTimeSeriesFile('/data/data.csv')
         data = file.get_data()
         self.assertEqual(len(data), 3) 
-        self.assertEqual(data[0], ['1949-01', 90])
-        self.assertEqual(data[-1], ['1950-11', 100])
+        self.assertEqual(data[0], ['1947-01', 90])
+        self.assertEqual(data[-1], ['1951-11', 100])
         
         global score
-        score += 4
+        score += 1
     
     def test_get_data_missing_file(self):
         with self.assertRaises(ExamException):
-            CSVTimeSeriesFile('/data/missing.csv')
-        
-        global score
-        score += 1
-        
-    def test_get_data_empty_file(self):
-        with self.assertRaises(ExamException):
-            CSVTimeSeriesFile('/data/empty.csv')
-        
-        global score
-        score += 1
-        
-    def test_get_data_incorrect_header(self):
-        file = CSVTimeSeriesFile('/data/incorrect_header.csv')
-        with self.assertRaises(ExamException):
+            file = CSVTimeSeriesFile('/data/missing.csv')
             file.get_data()
         
         global score
@@ -39,8 +25,8 @@ class TestComputeIncrements(unittest.TestCase):
     
     def test_get_data_invalid_rows(self):
         file = CSVTimeSeriesFile('/data/invalid_rows.csv')
-        with self.assertRaises(ExamException):
-            file.get_data()
+        data = file.get_data()
+        self.assertEqual( len(data), 2)
             
         global score
         score += 1
@@ -55,16 +41,16 @@ class TestComputeIncrements(unittest.TestCase):
         
     def test_get_data_dates_incorrect_format(self):
         file = CSVTimeSeriesFile('/data/dates_incorrect_format.csv')
-        with self.assertRaises(ExamException):
-            file.get_data()
+        data = file.get_data()
+        self.assertEqual( len(data), 2)
             
         global score
         score += 1
         
     def test_get_data_months_range(self):
         file = CSVTimeSeriesFile('/data/months_range.csv')
-        with self.assertRaises(ExamException):
-            file.get_data()
+        data = file.get_data()
+        self.assertEqual( len(data), 12)
             
         global score
         score += 1
@@ -126,9 +112,9 @@ class TestComputeIncrements(unittest.TestCase):
         self.assertEqual(expected, actual)
         
         global score
-        score += 4
+        score += 1
         
-    def test_fist_end_four_digits(self):
+    def test_first_last_four_digits(self):
         time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
         first_year = '2020' 
         last_year = '921'
@@ -138,7 +124,7 @@ class TestComputeIncrements(unittest.TestCase):
         global score
         score += 1
         
-    def test_firs_end_not_digits(self):
+    def test_first_last_not_digits(self):
         time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
         first_year = '2020' 
         last_year = 'test'
@@ -158,12 +144,23 @@ class TestComputeIncrements(unittest.TestCase):
         
         global score
         score += 1
+        
+    def test_missing_years(self):
+        time_series = [['2020-01', 100], ['2020-02', 120], ['2023-01', 140], ['2023-02', 150]] 
+        first_year = '2020'
+        last_year = '2023'
+        expected = {'2020-2023': 35.0}
+        actual = compute_increments(time_series, first_year, last_year)
+        self.assertEqual(expected, actual)
+        
+        global score
+        score += 1
 
     def test_empty_result(self):
         time_series = [['2020-01', 100], ['2022-01', 120]]
         first_year = '2020'
         last_year = '2021' 
-        expected = {}
+        expected = []
         actual = compute_increments(time_series, first_year, last_year)
         self.assertEqual(expected, actual)
         
@@ -227,7 +224,6 @@ class TestComputeIncrements(unittest.TestCase):
         print('\n\n-------------')
         print('| Voto: {}  |'.format(score))
         print('-------------\n')
-
 
 # Run the tests
 if __name__ == "__main__":
