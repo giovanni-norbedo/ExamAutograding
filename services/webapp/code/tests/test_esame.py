@@ -102,6 +102,14 @@ class TestComputeIncrements(unittest.TestCase):
             
         global score
         score += 1
+        
+    def test_get_data_other(self):
+        file = CSVTimeSeriesFile('/data/other.csv')
+        data = file.get_data()
+        self.assertEqual( len(data), 2)
+            
+        global score
+        score += 1
 
     def test_normal(self):
         time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
@@ -217,6 +225,7 @@ class TestComputeIncrements(unittest.TestCase):
         
         global score
         score += 1
+        
 
     @classmethod
     def tearDownClass(cls):
