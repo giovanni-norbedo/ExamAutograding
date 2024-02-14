@@ -9,7 +9,7 @@ services:
       - LOG_LEVEL=DEBUG
       - DEV_SERVER=true
     ports:
-      - "5000:5000"
+      - "0.0.0.0:5000:5000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./services/webapp/code:/opt/webapp/code
