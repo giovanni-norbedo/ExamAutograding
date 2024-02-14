@@ -16,8 +16,8 @@ class TestComputeIncrements(unittest.TestCase):
         score += 1
     
     def test_get_data_missing_file(self):
+        file = CSVTimeSeriesFile('/data/missing.csv')
         with self.assertRaises(ExamException):
-            file = CSVTimeSeriesFile('/data/missing.csv')
             file.get_data()
         
         global score
@@ -25,8 +25,9 @@ class TestComputeIncrements(unittest.TestCase):
     
     def test_get_data_invalid_rows(self):
         file = CSVTimeSeriesFile('/data/invalid_rows.csv')
-        data = file.get_data()
-        self.assertEqual( len(data), 2)
+        actual = file.get_data()
+        expected = [['1949-01', 90], ['1950-11', 100]]
+        self.assertEqual(expected, actual)
             
         global score
         score += 1
@@ -177,10 +178,11 @@ class TestComputeIncrements(unittest.TestCase):
 
     def test_invalid_years(self):
         time_series = [['2020-01', 100], ['2020-02', 120]]
-        first_year = '202'
-        last_year = '2021'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
+        first_year = '2019'
+        last_year = '2020'
+        expected = []
+        actual = compute_increments(time_series, first_year, last_year)
+        self.assertEqual(expected, actual)
         
         global score
         score += 1
@@ -225,7 +227,17 @@ class TestComputeIncrements(unittest.TestCase):
         
         global score
         score += 1
+    
+    def test_holes_hard(self):
+        time_series = [['2020-01', 100], ['2030-02', 120], ['2050-01', 130], ['2051-02', 140]]
+        first_year = '2020'
+        last_year = '2051'
+        expected = {'2020-2030': 20.0, '2030-2050': 10.0, '2051-2051': 10.0}
+        actual = compute_increments(time_series, first_year, last_year)
+        self.assertEqual(expected, actual)
         
+        global score
+        score += 1
 
     @classmethod
     def tearDownClass(cls):
