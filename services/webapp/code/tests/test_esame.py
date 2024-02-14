@@ -232,7 +232,7 @@ class TestComputeIncrements(unittest.TestCase):
         time_series = [['2020-01', 100], ['2030-02', 120], ['2050-01', 130], ['2051-02', 140]]
         first_year = '2020'
         last_year = '2051'
-        expected = {'2020-2030': 20.0, '2030-2050': 10.0, '2051-2051': 10.0}
+        expected = {'2020-2030': 20.0, '2030-2050': 10.0, '2050-2051': 10.0}
         actual = compute_increments(time_series, first_year, last_year)
         self.assertEqual(expected, actual)
         
