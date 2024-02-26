@@ -251,7 +251,7 @@ class TestComputeIncrements(unittest.TestCase):
         score += 1
         
     def test_negative_years(self):
-        time_series = [['1999-01', 100], ['1999-02', 120], ['2020-01', 130], ['2020-02', 140]]
+        time_series = [['-999-01', 100], ['-999-02', 120], ['2020-01', 130], ['2020-02', 140]]
         first_year = '-999'
         last_year = '2020'
         with self.assertRaises(ExamException):
