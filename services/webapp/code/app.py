@@ -56,7 +56,7 @@ def upload_file_and_exam():
     logger.debug("Saved exam file to '%s'", exam_file)
 
     # Set exam tests file
-    exam_tests_file = "test_esame.py"
+    exam_tests_file = "test_" + request.form["esami"] + ".py"
     logger.debug("Set exam tests file to '%s'", exam_tests_file)
 
     # Save exam tests file in the grading directory as well

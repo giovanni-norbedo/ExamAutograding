@@ -1,5 +1,6 @@
 import unittest
-from esame import CSVTimeSeriesFile, compute_increments, ExamException
+
+from esame import CSVTimeSeriesFile, find_min_max, ExamException
 
 score = 0
 
@@ -19,6 +20,7 @@ class TestComputeIncrements(unittest.TestCase):
         file = CSVTimeSeriesFile('/data/missing.csv')
         with self.assertRaises(ExamException):
             file.get_data()
+
         
         global score
         score += 1
@@ -36,6 +38,7 @@ class TestComputeIncrements(unittest.TestCase):
         file = CSVTimeSeriesFile('/data/dates_out_of_order.csv')
         with self.assertRaises(ExamException):
             file.get_data()
+
             
         global score
         score += 1
@@ -60,6 +63,7 @@ class TestComputeIncrements(unittest.TestCase):
         file = CSVTimeSeriesFile('/data/duplicate_dates.csv')
         with self.assertRaises(ExamException):
             file.get_data()
+
             
         global score
         score += 1
@@ -68,6 +72,7 @@ class TestComputeIncrements(unittest.TestCase):
         file = CSVTimeSeriesFile('/data/months_out_of_order.csv')
         with self.assertRaises(ExamException):
             file.get_data()
+
             
         global score
         score += 1
@@ -113,152 +118,53 @@ class TestComputeIncrements(unittest.TestCase):
         score += 1
 
     def test_normal(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
-        first_year = '2020' 
-        last_year = '2021'
-        expected = {'2020-2021': 25.0}
-        actual = compute_increments(time_series, first_year, last_year)
+        time_series = [['2012-01', 100], ['2012-02', 120], ['2012-03', 140], ['2012-04', 150], ['2012-05', 160], ['2012-06', 170], ['2012-07', 180], ['2012-08', 190], ['2012-09', 200], ['2012-10', 210], ['2012-11', 220], ['2012-12', 230]]
+        
+        expected = {'2012' : {'min' : ['01'], 'max' : ['12']}}
+        actual = find_min_max(time_series)
         self.assertEqual(expected, actual)
         
         global score
-        score += 3
-        
-    def test_first_last_four_digits(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
-        first_year = '2020' 
-        last_year = '921'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
-        
-        global score
-        score += 1
-        
-    def test_first_last_not_digits(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
-        first_year = '2020' 
-        last_year = 'test'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
-        
-        global score
-        score += 1
-
-    def test_missing_year(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2022-01', 140], ['2022-02', 150]] 
-        first_year = '2020'
-        last_year = '2022'
-        expected = {'2020-2022': 35.0}
-        actual = compute_increments(time_series, first_year, last_year)
-        self.assertEqual(expected, actual)
-        
-        global score
-        score += 1
-        
-    def test_missing_years(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2023-01', 140], ['2023-02', 150]] 
-        first_year = '2020'
-        last_year = '2023'
-        expected = {'2020-2023': 35.0}
-        actual = compute_increments(time_series, first_year, last_year)
-        self.assertEqual(expected, actual)
-        
-        global score
-        score += 1
+        score += 10
 
     def test_empty_result(self):
-        time_series = [['2020-01', 100], ['2022-01', 120]]
-        first_year = '2020'
-        last_year = '2021' 
-        expected = []
-        actual = compute_increments(time_series, first_year, last_year)
-        self.assertEqual(expected, actual)
-        
-        global score
-        score += 1
-
-    def test_invalid_years(self):
-        time_series = [['2020-01', 100], ['2020-02', 120]]
-        first_year = '2019'
-        last_year = '2020'
-        expected = []
-        actual = compute_increments(time_series, first_year, last_year)
-        self.assertEqual(expected, actual)
-        
-        global score
-        score += 1
-
-    def test_years_not_in_order(self):
-        time_series = [['2020-01', 100], ['2021-02', 120]]
-        first_year = '2021'
-        last_year = '2020'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
-
-        global score
-        score += 1
-
-    def test_years_not_in_data(self):
-        time_series = [['2020-01', 100], ['2020-02', 120]]
-        first_year = '2018'
-        last_year = '2020'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
-            
-        global score
-        score += 1
-        
-    def test_missing_first_year(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2021-01', 130], ['2021-02', 140]]
-        first_year = '2019'
-        last_year = '2021'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
-
-        global score
-        score += 1
-    
-    def test_holes(self):
-        time_series = [['2020-01', 100], ['2022-02', 120], ['2024-01', 130], ['2026-02', 140]]
-        first_year = '2020'
-        last_year = '2026'
-        expected = {'2020-2022': 20.0, '2022-2024': 10.0, '2024-2026': 10.0}
-        actual = compute_increments(time_series, first_year, last_year)
-        self.assertEqual(expected, actual)
-        
-        global score
-        score += 1
-    
-    def test_holes_hard(self):
-        time_series = [['2020-01', 100], ['2030-02', 120], ['2050-01', 130], ['2051-02', 140]]
-        first_year = '2020'
-        last_year = '2051'
-        expected = {'2020-2030': 20.0, '2030-2050': 10.0, '2050-2051': 10.0}
-        actual = compute_increments(time_series, first_year, last_year)
+        time_series = []
+        expected = {}
+        actual = find_min_max(time_series)
         self.assertEqual(expected, actual)
         
         global score
         score += 1
         
-    def test_same_year(self):
-        time_series = [['2020-01', 100], ['2020-02', 120], ['2020-01', 130], ['2020-02', 140]]
-        first_year = '2020'
-        last_year = '2020'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
+    def test_multiple_years(self):
+        time_series = [['2012-01', 100], ['2012-02', 120], ['2012-03', 140], ['2012-04', 150], ['2012-05', 160], ['2012-06', 170], ['2012-07', 180], ['2012-08', 190], ['2012-09', 200], ['2012-10', 210], ['2012-11', 220], ['2012-12', 230], ['2013-01', 100], ['2013-02', 120], ['2013-03', 140], ['2013-04', 150], ['2013-05', 160], ['2013-06', 170], ['2013-07', 180], ['2013-08', 190], ['2013-09', 200], ['2013-10', 210], ['2013-11', 220], ['2013-12', 230]]
+        
+        expected = {'2012' : {'min' : ['01'], 'max' : ['12']}, '2013' : {'min' : ['01'], 'max' : ['12']}}
+        actual = find_min_max(time_series)
+        self.assertEqual(expected, actual)
         
         global score
         score += 1
         
-    def test_negative_years(self):
-        time_series = [['1999-01', 100], ['1999-02', 120], ['2020-01', 130], ['2020-02', 140]]
-        first_year = '-999'
-        last_year = '2020'
-        with self.assertRaises(ExamException):
-            compute_increments(time_series, first_year, last_year)
+    def test_multiple_min_and_max(self):
+        time_series = [['1999-01', 1], ['1999-02', 1], ['1999-03', 1], ['1999-04', 2], ['1999-05', 1], ['1999-06', 4], ['1999-07', 3], ['1999-08', 3], ['1999-09', 1], ['1999-10', 4], ['1999-11', 4], ['1999-12', 4]]
+        
+        expected = {'1999' : {'min' : ['01', '02', '03', '05', '09'], 'max' : ['06', '10', '11', '12']}}
+        actual = find_min_max(time_series)
+        self.assertEqual(expected, actual)
         
         global score
-        score += 1
+        score += 2
+        
+    def test_only_one_month(self):
+        time_series = [['1999-01', 1], ['1999-02', 1], ['2000-01', 1]]
+        expected = {'1999' : {'min' : ['01', '02'], 'max' : ['01', '02']}, '2000' : {}}
+        actual = find_min_max(time_series)
+        self.assertEqual(expected, actual)
 
+        global score
+        score += 2
+        
     @classmethod
     def tearDownClass(cls):
         global score
